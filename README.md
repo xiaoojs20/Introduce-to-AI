@@ -2,6 +2,8 @@
 
 CS 188 | Introduction to Artificial Intelligence Spring 2020
 
+For any questions, please contact: xiaoojs20@gmail.com
+
 ## The Pac-Man Projects
 
 
