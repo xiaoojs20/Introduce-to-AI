@@ -1,6 +1,6 @@
 # Introduce-to-AI
 
-CS 188 | Introduction to Artificial Intelligence Spring 2020
+UCB CS 188 & Tsinghua | Introduction to Artificial Intelligence
 
 For any questions, please contact: xiaoojs20@gmail.com
 
