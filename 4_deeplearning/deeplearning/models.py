@@ -156,7 +156,6 @@ class RegressionModel(nn.Module):
         super(RegressionModel, self).__init__()
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
-
         n_feature = 1
         n_hidden = 20
         n_output = 1
@@ -301,8 +300,7 @@ class LanguageIDModel(nn.Module):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
         self.hidden_size = 128
-        self.gru = nn.GRU(input_size=self.num_chars, hidden_size=self.hidden_size, num_layers=5)
-        
+        self.gru = nn.GRU(input_size=self.num_chars, hidden_size=self.hidden_size, num_layers=1)
         self.fc = nn.Linear(in_features=self.hidden_size, out_features=len(self.languages))
 
     def forward(self, xs):
@@ -336,49 +334,13 @@ class LanguageIDModel(nn.Module):
         L = xs.size(0)
         batch_size = xs.size(1)
         
-        # Pack the input sequence
-        packed_input = nn.utils.rnn.pack_padded_sequence(xs, lengths=[L] * batch_size, enforce_sorted=False)
-
-        # Forward pass through GRU layer
-        packed_output, hidden = self.gru(packed_input)
-
-        # Unpack the output sequence
-        output, _ = nn.utils.rnn.pad_packed_sequence(packed_output)
-
-        # Get the last output of the GRU for each sequence
-        last_hidden = hidden[-1]
-
-        # Apply linear layer
-        logits = self.fc(last_hidden)
-
         output, hidden = self.gru(xs)
-        
-        # print(output.size())
-        # print(hidden.size())
-        # print('\n')
-        # Get the last output of the LSTM for each sequence
-        last_hidden = hidden[-1, :, :]
-
-        # Apply linear layer
-        logits = self.fc(last_hidden)
-        # print(last_hidden.size())
-        # logits = logits.reshape(batch_size, -1)
+        last_output = output[-1, :, :]
+        # print(last_output.shape)
+        logits = self.fc(last_output)
+        # print(logits.shape)
+        # print("--")
         return logits
-        L = xs.size(0)
-        batch_size = xs.size(1)
-        hidden0 = torch.zeros(L,batch_size,self.hidden_size)
-        self.embed = nn.Embedding(num_embeddings=batch_size, embedding_dim=self.num_chars)
-        xs=torch.LongTensor(xs)
-        embeded = self.embed(xs)
-        output, hidden = self.gru(embeded, hidden0)
-        print(output.size())
-        # output = output[-1,:,:]
-        print(hidden.size())
-        logits = self.fc(hidden[-1])
-        # print(logits.size())
-        # print('\n')
-        return logits
-
 
     def train_model(self, loader_train, loader_val):
         """
@@ -388,7 +350,7 @@ class LanguageIDModel(nn.Module):
         """
         "*** YOUR CODE HERE ***"
         criterion = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(self.parameters(), lr=0.1)
+        optimizer = torch.optim.Adam(self.parameters())
         num_epochs = 10
         for epoch in range(num_epochs):
             self.train()
@@ -425,7 +387,6 @@ class DeepQModel(nn.Module):
     A model that uses a Deep Q-value Network (DQN) to approximate Q(s,a) as part
     of reinforcement learning.
     """
-
     def __init__(self):
         super(DeepQModel, self).__init__()
         self.data_loader = backend.CartPoleLoader(self)
