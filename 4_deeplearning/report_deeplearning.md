@@ -69,25 +69,47 @@ Visualize the adversarial examples in figures/q3.png. Describe what the adversar
 
 ## Task 4: Language Identification (4 points + 1 bonus)  
 
-自然语言处理中一般是将 字/词 转换成一个one-hot向量，但是one-hot向量维度太高了，所以使用 嵌入层(Embed) 转换成低维的稠密的向量，然后经过RNN层，由于隐层的输出不一定和要求的输出一致，所以最后再加一个线性层。
+自然语言处理中一般是将 字/词 转换成一个one-hot向量，但是one-hot向量维度太高了，所以使用 嵌入层(Embed) 转换成低维的稠密的向量，然后经过RNN层，由于隐层的输出不一定和要求的输出一致，所以最后再加一个线性层。本次任务中one-hot向量并不算太大，不必采用嵌入层。
 
+本任务中，每一个单词的one-hot向量长度为47，设单词长度为L，神经网络结构如下：
 
+- GRU层：`input_size=self.num_chars(=47), hidden_size=self.hidden_size(=128), num_layers=1`
+  输入`xs`为一个`(L, batch_size, self.num_chars)`的tensor，输出`output`为一个`(L, batch_size, 128)`的结果，我们选择最后一个时间步输入到下一层中，因为这个结果才代表当前单词的语言结果。
+- Linear层：`in_features=self.hidden_size(=128), out_features=len(self.languages)(=5)`
+  输入为上述最后一个时间步的output，传入到Linear层中，得到`(batch_size, 5)`的语言分类结果。
 
-但是本文是一个分类问题，只需要得到最后的一个隐层，所以简化成下面这样：
+其他参数均采用默认参数，可以得到语言分类结果如下：
 
+Your final test set accuracy is: 88.20%
 
+## Conclusion
 
-进一步简化如下：
+- 卷积神经网络（Convolutional Neural Networks, CNNs）
 
+  卷积神经网络是一种在计算机视觉和图像处理领域广泛应用的深度学习模型。它能够有效地处理具有网格结构的数据，如图像。
 
+  1. 卷积层（Convolutional Layer）： 卷积层是CNN的核心组成部分之一。它利用卷积操作对输入数据进行特征提取。卷积操作通过将一个卷积核（也称为滤波器）应用于输入数据的每个位置来实现。卷积核是一个小的矩阵，通过在输入数据上进行滑动并执行逐元素相乘和求和来产生输出特征图。卷积层的主要目标是检测输入数据中的局部特征，如边缘、纹理等。
+  2. 归一化层（Normalization Layer）： 归一化层用于在卷积层后对特征图进行归一化处理。归一化的目的是增强网络的泛化能力、减少过拟合，并加速网络的训练过程。常见的归一化方法包括批量归一化（Batch Normalization）和层归一化（Layer Normalization）。
+  3. 池化层（Pooling Layer）： 池化层用于减小特征图的空间尺寸，并保留主要特征。常见的池化操作包括最大池化（Max Pooling）和平均池化（Average Pooling）。池化层通过在输入数据上滑动一个固定大小的窗口，并从窗口中提取最大值或平均值来生成池化特征图。
 
+  卷积神经网络的应用场景包括但不限于：
 
+  - 图像分类：通过训练CNN模型，可以对图像进行分类，例如将图像识别为猫、狗等不同类别。
+  - 目标检测：CNN可以用于检测图像中的物体位置和边界框，常见的目标检测算法如Faster R-CNN、YOLO和SSD都基于CNN。
+  - 图像分割：CNN可以对图像进行像素级别的分割，将图像中的不同物体或区域进行分离，例如语义分割和实例分割。
+  - 图像生成：通过反卷积网络（Deconvolutional Network）和生成对抗网络（Generative Adversarial Networks, GANs），CNN可以用于生成逼真的图像，如风景、人脸等。
 
+- 循环神经网络（Recurrent Neural Networks, RNNs）
 
+  循环神经网络是一种处理序列数据的神经网络模型。它具有记忆功能，可以捕捉序列数据中的上下文信息。
 
+  1. GRU层（Gated Recurrent Unit）： GRU层是一种循环神经网络的变体，旨在解决传统RNN存在的梯度消失和梯度爆炸问题。GRU通过引入门控机制，如重置门（Reset Gate）和更新门（Update Gate），有效地控制信息的传递和遗忘。重置门决定应该如何将当前输入与先前的状态相结合，而更新门决定应该如何将先前的状态与新的状态进行结合。
+  2. 线性层（Linear Layer）： 线性层也称为全连接层或密集层，它将输入数据与权重矩阵进行矩阵乘法，并添加偏置项，生成输出结果。线性层通常用于将循环神经网络的隐藏状态映射到所需的输出维度。
 
+  循环神经网络的应用场景包括但不限于：
 
-
-
-
-
+  - 语言建模：循环神经网络可以用于建模文本数据，如句子或文档，对下一个单词或字符进行预测。
+  - 机器翻译：通过训练RNN模型，可以将一种语言翻译成另一种语言，例如将英文翻译成法文。
+  - 语音识别：RNN可用于将语音信号转换为文本，实现自动语音识别（Automatic Speech Recognition, ASR）。
+  - 序列生成：循环神经网络可以生成序列数据，如音乐、手写字体等。
+  - 情感分析：通过训练RNN模型，可以对文本进行情感分析，判断其情绪倾向，如积极、消极或中性。
